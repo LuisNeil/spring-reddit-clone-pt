@@ -1,6 +1,8 @@
 package org.ltejeda.springredditclone.controller;
 
 import lombok.AllArgsConstructor;
+import org.ltejeda.springredditclone.dto.AuthenticationResponse;
+import org.ltejeda.springredditclone.dto.LoginRequest;
 import org.ltejeda.springredditclone.dto.RegisterRequest;
 import org.ltejeda.springredditclone.service.AuthService;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,11 @@ public class AuthController {
     public ResponseEntity<String> signup(@RequestBody RegisterRequest registerRequest) {
         authService.signup(registerRequest);
         return new ResponseEntity<>("User Registration Successful", HttpStatus.OK);
+    }
+
+    @PostMapping("/login")
+    public AuthenticationResponse login(@RequestBody LoginRequest loginRequest){
+       return authService.login(loginRequest);
     }
 
     @GetMapping("accountVerification/{token}")

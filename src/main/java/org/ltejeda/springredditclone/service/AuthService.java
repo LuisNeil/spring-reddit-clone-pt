@@ -1,6 +1,9 @@
 package org.ltejeda.springredditclone.service;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.ltejeda.springredditclone.dto.AuthenticationResponse;
+import org.ltejeda.springredditclone.dto.LoginRequest;
 import org.ltejeda.springredditclone.dto.RegisterRequest;
 import org.ltejeda.springredditclone.exceptions.SpringRedditException;
 import org.ltejeda.springredditclone.model.NotificationEmail;
@@ -8,6 +11,11 @@ import org.ltejeda.springredditclone.model.User;
 import org.ltejeda.springredditclone.model.VerificationToken;
 import org.ltejeda.springredditclone.repository.UserRepository;
 import org.ltejeda.springredditclone.repository.VerificationTokenRepository;
+import org.ltejeda.springredditclone.security.JwtProvider;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +31,8 @@ public class AuthService {
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final MailService mailService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtProvider jwtProvider;
 
     @Transactional
     public void signup(RegisterRequest registerRequest) {
@@ -57,11 +67,19 @@ public class AuthService {
     }
 
     @Transactional
-    private void fetchUserAndEnable(VerificationToken verificationToken) {
+    void fetchUserAndEnable(VerificationToken verificationToken) {
         String username = verificationToken.getUser().getUsername();
         User user = userRepository.findByUsername(username).orElseThrow(() -> new SpringRedditException("User Not" +
                 " Found with name: " + username));
         user.setEnabled(true);
         userRepository.save(user);
+    }
+
+    public AuthenticationResponse login(LoginRequest loginRequest) {
+        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
+                loginRequest.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authenticate);
+        String authenticationToken = jwtProvider.generateToken(authenticate);
+        return new AuthenticationResponse(authenticationToken, loginRequest.getUsername());
     }
 }

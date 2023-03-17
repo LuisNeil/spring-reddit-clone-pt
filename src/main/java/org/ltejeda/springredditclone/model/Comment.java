@@ -1,9 +1,6 @@
 package org.ltejeda.springredditclone.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -14,6 +11,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @Builder
 @Entity
+@Getter
+@Setter
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
