@@ -1,15 +1,17 @@
 package org.ltejeda.springredditclone.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.time.Instant;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class AuthenticationResponse {
     private String authenticationToken;
     private String username;
+    private Instant expiresAt;
+    private String refreshToken;
 }
